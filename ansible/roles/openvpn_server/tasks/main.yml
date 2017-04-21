@@ -1,0 +1,89 @@
+---
+################
+# Setup OpenVPN
+################
+
+# Check for mandatory variables
+
+- fail: msg="Variable ca_cert not defined"
+  when: ca_cert is undefined
+
+- fail: msg="Variable server_cert not defined"
+  when: server_cert is undefined
+
+- fail: msg="Variable server_key not defined"
+  when: server_key is undefined
+
+- fail: msg="Variable dh_params not defined"
+  when: dh_params is undefined
+
+# Install OpenVPN
+
+- name: "Install OpenVPN"
+  apt: name=openvpn state=present
+
+# Copy certificates
+
+- name: "Ensures /etc/openvpn/certs dir exists"
+  file: path=/etc/openvpn/certs state=directory mode=700
+
+- name: "Copy CA certificate"
+  copy: src=openvpn/{{ ca_cert }} dest=/etc/openvpn/certs/ca.crt mode=400
+  notify: restart openvpn
+
+- name: "Copy Server certificate"
+  copy: src=openvpn/{{ server_cert }} dest=/etc/openvpn/certs/server.crt mode=400
+  notify: restart openvpn
+
+- name: "Copy Server key"
+  copy: src=openvpn/{{ server_key }} dest=/etc/openvpn/certs/server.key mode=400
+  notify: restart openvpn
+
+- name: "Copy DH parameters"
+  copy: src=openvpn/{{ dh_params }} dest=/etc/openvpn/certs/dh.pem mode=400
+  notify: restart openvpn
+
+# Copy configuration
+- name: "Copy OpenVPN configuration"
+  template: src=server.conf dest=/etc/openvpn/server.conf
+  notify: restart openvpn
+
+- service: name=openvpn state=started enabled=true
+
+#######################
+# Update hosts
+#######################
+
+- name: "Update hosts"
+  template: src=hosts dest=/etc/hosts
+
+#######################
+# Enable IP forwarding
+#######################
+
+- name: "Enable IP forwarding"
+  sysctl: name="net.ipv4.ip_forward" value=1
+
+##########
+# DNSMasq
+##########
+
+- name: "Install DNSMasq"
+  apt: name=dnsmasq state=present
+
+- name: "Copy DNSMasq configuration"
+  template: src=dnsmasq.conf dest=/etc/dnsmasq.conf mode=600
+  notify: restart dnsmasq
+
+- name: "Protect /etc/dnsmasq.d/README"
+  command: chattr +i /etc/dnsmasq.d/README
+
+- service: name=dnsmasq state=started enabled=true
+
+##############
+# Resolv.conf
+##############
+
+- name: "Setup resolv.conf"
+  copy: src=resolv.conf dest=/etc/resolv.conf
+
