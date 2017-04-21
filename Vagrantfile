@@ -32,5 +32,18 @@ Vagrant.configure(2) do |config|
      vb.memory = "512"
      vb.cpus = 1
    end
+   client.vm.provision "ansible/client", type: "ansible" do |ansible|
+     ansible.playbook = "ansible/openvpn_client.yml"
+     ansible.verbose = "v"
+     ansible.extra_vars = {
+         "target" => "client", 
+         "ip_address" => "{{ ansible_eth1.ipv4.address }}",
+         "hostname" => "{{ ansible_hostname }}",
+         "ca_cert" => "ca.crt", 
+         "client_cert" => "openvpnclient.local.crt",
+         "client_key" => "openvpnclient.local.key"
+     }
+    end
+
  end
 end
