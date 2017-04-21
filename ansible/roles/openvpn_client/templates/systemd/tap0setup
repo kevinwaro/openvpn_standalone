@@ -1,0 +1,21 @@
+#!/bin/bash
+
+ETH_MAC_ADDRESS=`ip addr show {{ eth_interface }} | grep link/ether | awk '{ print $2 }'`
+
+echo "Initializing tap0 using {{ eth_interface }} MAC address: ${ETH_MAC_ADDRESS}"
+
+/usr/sbin/openvpn --mktun --dev tap0 --lladdr ${ETH_MAC_ADDRESS} 
+
+echo "Creating Ethernet bridge"
+
+brctl addbr br0
+
+ifconfig tap0 up
+
+echo "Adding tap0 to Ethernet bridge"
+
+brctl addif br0 tap0
+
+echo "Setting vpn static ip"
+
+ifconfig br0 {{ vpn_client_vpn_ip }} netmask {{ vpn_server_vpn_netmask }} broadcast {{ vpn_server_vpn_broadcast }}

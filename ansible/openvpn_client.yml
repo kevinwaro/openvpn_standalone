@@ -4,4 +4,4 @@
   become_method: sudo
   become_user: root
   roles:
-      - role: install_openvpn_client
+    - role: openvpn_client

@@ -1,0 +1,12 @@
+[Unit]
+Description=tap0 setup
+After=network.target
+Before=openvpn.service
+
+[Service]
+Type=oneshot
+ExecStart=/etc/openvpn/scripts/tap0setup
+RemainAfterExit=true
+
+[Install]
+WantedBy=multi-user.target

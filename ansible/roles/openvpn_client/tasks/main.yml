@@ -1,0 +1,98 @@
+---
+################
+# Setup OpenVPN
+################
+
+# Check for mandatory variables
+
+- fail: msg="Variable ca_cert not defined"
+  when: ca_cert is undefined
+
+- fail: msg="Variable client_cert not defined"
+  when: client_cert is undefined
+
+- fail: msg="Variable client_key not defined"
+  when: client_key is undefined
+
+- fail: msg="Variable vpn_server_ip not defined"
+  when: vpn_server_ip is undefined
+
+- fail: msg="Variable vpn_server_vpn_ip not defined"
+  when: vpn_server_vpn_ip is undefined
+
+- fail: msg="Variable vpn_client_vpn_ip not defined"
+  when: vpn_client_vpn_ip is undefined
+
+- fail: msg="Variable vpn_server_vpn_netmask not defined"
+  when: vpn_server_vpn_netmask is undefined
+
+- fail: msg="Variable eth_interface not defined"
+  when: eth_interface is undefined
+
+- fail: msg="Variable default_name_server not defined"
+  when: default_name_server is undefined
+
+# Install bridge-utils
+- name: "Install bridge-utils"
+  apt: name=bridge-utils state=present
+
+# Install OpenVPN
+
+- name: "Install OpenVPN"
+  apt: name=openvpn state=present
+
+# Copy certificates
+
+- name: "Ensures /etc/openvpn/certs dir exists"
+  file: path=/etc/openvpn/certs state=directory mode=700
+
+- name: "Copy CA certificate"
+  copy: src=openvpn/{{ ca_cert }} dest=/etc/openvpn/certs/{{ ca_cert }} mode=400
+  notify: restart openvpn
+
+- name: "Copy Client certificate"
+  copy: src=openvpn/{{ client_cert }} dest=/etc/openvpn/certs/{{ client_cert }} mode=400
+  notify: restart openvpn
+
+- name: "Copy Client key"
+  copy: src=openvpn/{{ client_key }} dest=/etc/openvpn/certs/{{ client_key }} mode=400
+  notify: restart openvpn
+
+# Copy configuration
+
+- name: "Copy OpenVPN configuration"
+  template: src=client.conf dest=/etc/openvpn/client.conf
+  notify: restart openvpn
+
+# Copy tap0 setup script
+
+- name: "Ensures /etc/openvpn/scripts dir exists"
+  file: path=/etc/openvpn/scripts state=directory mode=755
+
+- name: "Copy tap0setup script"
+  template: src=systemd/tap0setup dest=/etc/openvpn/scripts/tap0setup mode=755
+
+# Let OpenVPN be started at the end by handlers
+
+- service: name=openvpn enabled=true
+
+#########################
+# Configure DHCP options
+#########################
+
+- name: "Set DHClient options"
+  template: src=dhclient/dhclient.conf dest=/etc/dhcp/dhclient.conf
+
+##################################
+# Setup tap0 setup Systemd service 
+##################################
+
+- name: "Copy Systemd service for tap0 setup"
+  copy: src=systemd/tap0setup.service dest=/etc/systemd/system/tap0setup.service
+  register: install_config
+
+- name: notify systemd of config changes
+  command: systemctl daemon-reload
+  when: install_config.changed == True
+
+- service: name=tap0setup state=started enabled=true
