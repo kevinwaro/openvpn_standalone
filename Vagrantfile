@@ -44,6 +44,6 @@ Vagrant.configure(2) do |config|
          "client_key" => "openvpnclient.local.key"
      }
     end
-
  end
+
 end

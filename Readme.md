@@ -38,10 +38,7 @@ By default, the assigned addressed are via DHCP. But it's also possible to assig
              "ca_cert" => "ca.crt", 
              "client_cert" => "openvpnclient.local.crt",
              "client_key" => "openvpnclient.local.key",
-             "static_ip" => "True",
              "vpn_client_vpn_ip" => "172.16.200.10",
-             "vpn_client_vpn_netmask" => "255.255.0.0",
-             "vpn_client_vpn_broadcast" => "172.16.255.255"
          }
         end
      end
