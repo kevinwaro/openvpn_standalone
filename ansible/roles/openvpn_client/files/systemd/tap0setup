@@ -1,0 +1,7 @@
+#!/bin/bash
+
+ETH0_MAC_ADDRESS=`ip addr show eth0 | grep link/ether | awk '{ print $2 }'`
+
+echo "Initializing tap0 using eth0 MAC address: ${ETH0_MAC_ADDRESS}"
+
+/usr/sbin/openvpn --mktun --dev tap0 --lladdr ${ETH0_MAC_ADDRESS}

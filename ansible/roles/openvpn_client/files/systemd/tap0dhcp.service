@@ -1,0 +1,14 @@
+[Unit]
+Description=tap0 DHCP
+After=openvpn@client.service
+
+[Service]
+ExecStart=/sbin/dhclient -v -pf /run/dhclient.tap0.pid -lf /var/lib/dhcp/dhclient.tap0.leases tap0
+Type=forking
+PIDFile=/run/dhclient.tap0.pid
+ExecReload=/bin/kill -HUP $MAINPID
+ExecStop=/bin/kill $MAINPID
+KillMode=process
+
+[Install]
+WantedBy=multi-user.target

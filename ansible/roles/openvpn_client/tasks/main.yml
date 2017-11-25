@@ -20,9 +20,6 @@
 - fail: msg="Variable vpn_server_vpn_ip not defined"
   when: vpn_server_vpn_ip is undefined
 
-- fail: msg="Variable vpn_client_vpn_ip not defined"
-  when: vpn_client_vpn_ip is undefined
-
 - fail: msg="Variable vpn_server_vpn_netmask not defined"
   when: vpn_server_vpn_netmask is undefined
 
@@ -71,6 +68,11 @@
 
 - name: "Copy tap0setup script"
   template: src=systemd/tap0setup dest=/etc/openvpn/scripts/tap0setup mode=755
+  when: vpn_client_vpn_ip is defined
+
+- name: "Copy tap0setup script"
+  copy: src=systemd/tap0setup dest=/etc/openvpn/scripts/tap0setup mode=755
+  when: vpn_client_vpn_ip is undefined
 
 # Let OpenVPN be started at the end by handlers
 
@@ -96,3 +98,22 @@
   when: install_config.changed == True
 
 - service: name=tap0setup state=started enabled=true
+
+##################################
+## Setup tap0 DHCP Systemd service
+###################################
+
+- name: "Copy Systemd service for tap0 DHCP"
+  copy: src=systemd/tap0dhcp.service dest=/etc/systemd/system/tap0dhcp.service
+  register: install_config
+  notify: restart tap0dhcp
+  when: vpn_client_vpn_ip  is undefined
+
+- name: "Notify systemd of config changes"
+  command: systemctl daemon-reload
+  notify: restart tap0dhcp
+  when: (install_config.changed == True) and  (vpn_client_vpn_ip is undefined)
+
+# Let tap0dhcp be started at the end by handlers, just enable it
+- service: name=tap0dhcp enabled=true
+  when: vpn_client_vpn_ip is undefined
