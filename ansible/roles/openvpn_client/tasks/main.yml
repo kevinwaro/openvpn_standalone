@@ -67,11 +67,11 @@
   file: path=/etc/openvpn/scripts state=directory mode=755
 
 - name: "Copy tap0setup script"
-  template: src=systemd/tap0setup dest=/etc/openvpn/scripts/tap0setup mode=755
+  template: src=systemd/tap0setup_static dest=/etc/openvpn/scripts/tap0setup mode=755
   when: vpn_client_vpn_ip is defined
 
 - name: "Copy tap0setup script"
-  copy: src=systemd/tap0setup dest=/etc/openvpn/scripts/tap0setup mode=755
+  template: src=systemd/tap0setup_dynamic dest=/etc/openvpn/scripts/tap0setup mode=755
   when: vpn_client_vpn_ip is undefined
 
 # Let OpenVPN be started at the end by handlers
