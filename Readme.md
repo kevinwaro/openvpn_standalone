@@ -50,5 +50,4 @@ By default, the assigned addressed are via DHCP. But it's also possible to assig
 
 ## Licence
 
-Copyright © 2018 kevinwaro <kevinwaro@yahoo.fr>
-This project is licensed under the GNU GPLv3 License - see the LICENSE.md file for details
+This project is licensed under the GNU GPLv3 License - see the [LICENSE.md](LICENSE.md) file for details
