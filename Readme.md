@@ -18,7 +18,7 @@ Then let Vagrant play the music:
  
 It's possible to add as many boxes as you want. Just be sure to run the right playbook on it. 
 
-By default, the assigned addressed are via DHCP. But it's also possible to assign fixed ones. you will just need to add the following lines to the Vagrantfile in the client's ansible.extra_vars section like as followed for a box called 'client1' :
+By default, the assigned addressed are via DHCP. But it's also possible to assign fixed ones. You will just need to add an extra var to the Vagrantfile in the client's ansible provider section, like as followed for a box called 'client1' :
 
      config.vm.define "client1" do |client1|
        client1.vm.box ="debian/jessie64" 
@@ -50,7 +50,5 @@ By default, the assigned addressed are via DHCP. But it's also possible to assig
 
 ## Licence
 
-Copyright © 2017 kevinwaro <kevinwaro@yahoo.fr>
-This work is free. You can redistribute it and/or modify it under the
-terms of the Do What The Fuck You Want To Public License, Version 2,
-as published by Sam Hocevar. See the COPYING file for more details.
+Copyright © 2018 kevinwaro <kevinwaro@yahoo.fr>
+This project is licensed under the GNU GPLv3 License - see the LICENSE.md file for details
