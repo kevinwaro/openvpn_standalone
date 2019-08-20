@@ -28,19 +28,19 @@
   file: path=/etc/openvpn/certs state=directory mode=700
 
 - name: "Copy CA certificate"
-  copy: src=openvpn/{{ ca_cert }} dest=/etc/openvpn/certs/ca.crt mode=400
+  copy: src=openvpn/{{ ca_cert }} dest=/etc/openvpn/certs/{{ ca_cert }} mode=400
   notify: restart openvpn
 
 - name: "Copy Server certificate"
-  copy: src=openvpn/{{ server_cert }} dest=/etc/openvpn/certs/server.crt mode=400
+  copy: src=openvpn/{{ server_cert }} dest=/etc/openvpn/certs/{{ server_cert }} mode=400
   notify: restart openvpn
 
 - name: "Copy Server key"
-  copy: src=openvpn/{{ server_key }} dest=/etc/openvpn/certs/server.key mode=400
+  copy: src=openvpn/{{ server_key }} dest=/etc/openvpn/certs/{{ server_key }} mode=400
   notify: restart openvpn
 
 - name: "Copy DH parameters"
-  copy: src=openvpn/{{ dh_params }} dest=/etc/openvpn/certs/dh.pem mode=400
+  copy: src=openvpn/{{ dh_params }} dest=/etc/openvpn/certs/{{ dh_params }} mode=400
   notify: restart openvpn
 
 # Copy configuration
