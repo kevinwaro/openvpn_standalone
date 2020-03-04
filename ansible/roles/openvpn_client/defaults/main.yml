@@ -1,5 +1,4 @@
 ---
-eth_interface: eth1
 default_name_server: 8.8.8.8
 vpn_server_ip: 192.168.200.10
 vpn_server_vpn_ip: 172.16.1.1

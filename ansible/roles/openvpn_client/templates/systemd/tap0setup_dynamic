@@ -1,6 +1,6 @@
 #!/bin/bash
 
-ETH_MAC_ADDRESS=`ip addr show {{ eth_interface }} | grep link/ether | awk '{ print $2 }'`
+ETH_MAC_ADDRESS=`ip addr show {{ ansible_default_ipv4.interface }} | grep link/ether | awk '{ print $2 }'`
 
 echo "Initializing tap0 using eth0 MAC address: ${ETH_MAC_ADDRESS}"
 
