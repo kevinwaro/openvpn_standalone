@@ -2,7 +2,7 @@
 Vagrant.configure(2) do |config|
 
  config.vm.define "server" do |server|
-   server.vm.box ="debian/stretch64"
+   server.vm.box ="debian/buster64"
    server.vm.network "private_network", ip: "192.168.200.10"
    server.vm.hostname = "server"
    server.vm.provider "virtualbox" do |vb|
@@ -25,7 +25,7 @@ Vagrant.configure(2) do |config|
  end
 
  config.vm.define "client" do |client|
-   client.vm.box ="debian/stretch64"
+   client.vm.box ="debian/buster64"
    client.vm.network "private_network", ip: "192.168.200.11"
    client.vm.hostname = "client"
    client.vm.provider "virtualbox" do |vb|
