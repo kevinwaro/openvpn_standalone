@@ -41,7 +41,8 @@ Vagrant.configure(2) do |config|
          "hostname" => "{{ ansible_hostname }}",
          "ca_cert" => "ca.crt", 
          "client_cert" => "openvpnclient.local.crt",
-         "client_key" => "openvpnclient.local.key"
+         "client_key" => "openvpnclient.local.key",
+         "eth_interface" => "eth0"
      }
     end
  end
