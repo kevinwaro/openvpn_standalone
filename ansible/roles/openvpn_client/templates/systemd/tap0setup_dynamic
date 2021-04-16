@@ -1,7 +1,0 @@
-#!/bin/bash
-
-ETH_MAC_ADDRESS=`ip addr show {{ ansible_default_ipv4.interface }} | grep link/ether | awk '{ print $2 }'`
-
-echo "Initializing tap0 using eth0 MAC address: ${ETH_MAC_ADDRESS}"
-
-/usr/sbin/openvpn --mktun --dev tap0 --lladdr ${ETH_MAC_ADDRESS}

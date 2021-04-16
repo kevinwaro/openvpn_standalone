@@ -1,4 +1,0 @@
-127.0.0.1     localhost
-{{ ip_address }}  {{ hostname }}
-{{ vpn_server_vpn_ip }}    {{ hostname }}.vpn
-{{ vpn_server_vpn_ip }}    vpn-server.vpn

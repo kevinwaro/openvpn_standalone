@@ -1,9 +1,7 @@
 ---
-################
-# Setup OpenVPN
-################
-
+###############################
 # Check for mandatory variables
+###############################
 
 - fail: msg="Variable ca_cert not defined"
   when: ca_cert is undefined
@@ -29,16 +27,19 @@
 - fail: msg="Variable default_name_server not defined"
   when: default_name_server is undefined
 
-# Install bridge-utils
-- name: "Install bridge-utils"
-  apt: name=bridge-utils state=present
-
+#################
 # Install OpenVPN
+#################
 
 - name: "Install OpenVPN"
   apt: name=openvpn state=present
 
+- name: "Install resolvconf"
+  apt: name=resolvconf state=present
+
+#################
 # Copy certificates
+#################
 
 - name: "Ensures /etc/openvpn/certs dir exists"
   file: path=/etc/openvpn/certs state=directory mode=700
@@ -53,67 +54,19 @@
 
 - name: "Copy Client key"
   copy: src=openvpn/{{ client_key }} dest=/etc/openvpn/certs/{{ client_key }} mode=400
-  notify: restart openvpn
 
+#################
 # Copy configuration
+#################
 
 - name: "Copy OpenVPN configuration"
   template: src=client.conf dest=/etc/openvpn/client.conf
   notify: restart openvpn
 
-# Copy tap0 setup script
-
-- name: "Ensures /etc/openvpn/scripts dir exists"
-  file: path=/etc/openvpn/scripts state=directory mode=755
-
-- name: "Copy tap0setup script"
-  template: src=systemd/tap0setup_static dest=/etc/openvpn/scripts/tap0setup mode=755
-  when: vpn_client_vpn_ip is defined
-
-- name: "Copy tap0setup script"
-  template: src=systemd/tap0setup_dynamic dest=/etc/openvpn/scripts/tap0setup mode=755
-  when: vpn_client_vpn_ip is undefined
-
-# Let OpenVPN be started at the end by handlers
+#################
+# Enable and start openVPN
+#################
 
 - service: name=openvpn enabled=true
 
-#########################
-# Configure DHCP options
-#########################
-
-- name: "Set DHClient options"
-  template: src=dhclient/dhclient.conf dest=/etc/dhcp/dhclient.conf
-
-##################################
-# Setup tap0 setup Systemd service 
-##################################
-
-- name: "Copy Systemd service for tap0 setup"
-  copy: src=systemd/tap0setup.service dest=/etc/systemd/system/tap0setup.service
-  register: install_config
-
-- name: notify systemd of config changes
-  command: systemctl daemon-reload
-  when: install_config.changed == True
-
-- service: name=tap0setup state=started enabled=true
-
-##################################
-## Setup tap0 DHCP Systemd service
-###################################
-
-- name: "Copy Systemd service for tap0 DHCP"
-  copy: src=systemd/tap0dhcp.service dest=/etc/systemd/system/tap0dhcp.service
-  register: install_config
-  notify: restart tap0dhcp
-  when: vpn_client_vpn_ip  is undefined
-
-- name: "Notify systemd of config changes"
-  command: systemctl daemon-reload
-  notify: restart tap0dhcp
-  when: (install_config.changed == True) and  (vpn_client_vpn_ip is undefined)
-
-# Let tap0dhcp be started at the end by handlers, just enable it
-- service: name=tap0dhcp enabled=true
-  when: vpn_client_vpn_ip is undefined
+- command: systemctl start openvpn@client.service

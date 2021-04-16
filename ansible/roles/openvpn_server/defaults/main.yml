@@ -1,6 +1,7 @@
 ---
-vpn_server_vpn_ip: 172.16.1.1
+vpn_server_vpn_ip: 172.16.0.1
+vpn_server_network: 172.16.0.0
 vpn_server_vpn_netmask: 255.255.0.0
-vpn_dhcp_range_start: 172.16.1.2
-vpn_dhcp_range_end: 172.16.1.254
+vpn_network_cidr:  172.16.0.0/16
 default_name_server: 8.8.8.8
+default_interface: eth0

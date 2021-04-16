@@ -1,6 +1,3 @@
 ---
 - name: restart openvpn
-  service: name=openvpn state=restarted
-
-- name: restart tap0dhcp
-  service: name=tap0dhcp state=restarted
+  service: name=openvpn@client state=restarted

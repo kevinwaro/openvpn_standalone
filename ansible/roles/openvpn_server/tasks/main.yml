@@ -1,9 +1,7 @@
 ---
-################
-# Setup OpenVPN
-################
-
+###############################
 # Check for mandatory variables
+###############################
 
 - fail: msg="Variable ca_cert not defined"
   when: ca_cert is undefined
@@ -17,12 +15,36 @@
 - fail: msg="Variable dh_params not defined"
   when: dh_params is undefined
 
+#######################
+# Update hosts
+#######################
+
+#- name: "Update hosts"
+#  template: src=hosts dest=/etc/hosts
+
+#######################
+# Enable IP forwarding
+#######################
+
+- name: "Enable ip_forward"
+  sysctl: name=net.ipv4.ip_forward value=1 state=present
+
+- name: "Accept to forward between interfaces"
+  command: iptables -I FORWARD -j ACCEPT
+
+- name: "Add nat for openvpn trafffic to internet"
+  command: "iptables -t nat -A POSTROUTING -s {{ vpn_network_cidr }} -o {{ default_interface }} -j MASQUERADE"
+
+#######################
 # Install OpenVPN
+#######################
 
 - name: "Install OpenVPN"
   apt: name=openvpn state=present
 
+#######################
 # Copy certificates
+#######################
 
 - name: "Ensures /etc/openvpn/certs dir exists"
   file: path=/etc/openvpn/certs state=directory mode=700
@@ -33,57 +55,25 @@
 
 - name: "Copy Server certificate"
   copy: src=openvpn/{{ server_cert }} dest=/etc/openvpn/certs/{{ server_cert }} mode=400
-  notify: restart openvpn
 
 - name: "Copy Server key"
   copy: src=openvpn/{{ server_key }} dest=/etc/openvpn/certs/{{ server_key }} mode=400
-  notify: restart openvpn
 
 - name: "Copy DH parameters"
   copy: src=openvpn/{{ dh_params }} dest=/etc/openvpn/certs/{{ dh_params }} mode=400
-  notify: restart openvpn
 
+#######################
 # Copy configuration
+#######################
+
 - name: "Copy OpenVPN configuration"
   template: src=server.conf dest=/etc/openvpn/server.conf
-  notify: restart openvpn
-
-- service: name=openvpn state=started enabled=true
 
 #######################
-# Update hosts
+# Enable and start OpenVPN
 #######################
 
-- name: "Update hosts"
-  template: src=hosts dest=/etc/hosts
+- service: name=openvpn enabled=true
 
-#######################
-# Enable IP forwarding
-#######################
-
-- name: "Enable IP forwarding"
-  sysctl: name="net.ipv4.ip_forward" value=1
-
-##########
-# DNSMasq
-##########
-
-- name: "Install DNSMasq"
-  apt: name=dnsmasq state=present
-
-- name: "Copy DNSMasq configuration"
-  template: src=dnsmasq.conf dest=/etc/dnsmasq.conf mode=600
-  notify: restart dnsmasq
-
-- name: "Protect /etc/dnsmasq.d/README"
-  command: chattr +i /etc/dnsmasq.d/README
-
-- service: name=dnsmasq state=started enabled=true
-
-##############
-# Resolv.conf
-##############
-
-- name: "Setup resolv.conf"
-  copy: src=resolv.conf dest=/etc/resolv.conf
+- command: systemctl start openvpn@server.service
 
