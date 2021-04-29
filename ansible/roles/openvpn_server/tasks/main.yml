@@ -30,10 +30,17 @@
   sysctl: name=net.ipv4.ip_forward value=1 state=present
 
 - name: "Accept to forward between interfaces"
-  command: iptables -I FORWARD -j ACCEPT
+  iptables:
+      chain: FORWARD
+      policy: ACCEPT
 
 - name: "Add nat for openvpn trafffic to internet"
-  command: "iptables -t nat -A POSTROUTING -s {{ vpn_network_cidr }} -o {{ default_interface }} -j MASQUERADE"
+  iptables:
+      table: nat
+      chain: POSTROUTING
+      source: "{{ vpn_network_cidr }}"
+      out_interface: "{{ default_interface }}"
+      jump: MASQUERADE
 
 #######################
 # Install OpenVPN
