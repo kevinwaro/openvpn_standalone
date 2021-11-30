@@ -32,7 +32,7 @@
 #################
 
 - name: "Install OpenVPN"
-  apt: name=openvpn state=present
+  apt: name=openvpn state=present update_cache=true
 
 - name: "Install resolvconf"
   apt: name=resolvconf state=present
