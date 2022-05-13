@@ -5,10 +5,11 @@ Vagrant.configure(2) do |config|
    server.vm.box ="debian/bullseye64"
    server.vm.network "private_network", ip: "192.168.200.10"
    server.vm.hostname = "server"
-   server.vm.provider "virtualbox" do |vb|
+   server.vm.provider "libvirt" do |vb|
      vb.memory = "512"
      vb.cpus = 1
    end
+   server.vm.synced_folder "./", "/vagrant", type: "rsync"
    server.vm.provision "ansible/server", type: "ansible" do |ansible|
      ansible.playbook = "ansible/openvpn_server.yml"
      ansible.verbose = "v"
@@ -26,12 +27,13 @@ Vagrant.configure(2) do |config|
 
  config.vm.define "client" do |client|
    client.vm.box ="debian/bullseye64"
-   client.vm.network "private_network", ip: "192.168.200.11"
+   client.vm.network "private_network", ip: "192.168.200.12"
    client.vm.hostname = "client"
-   client.vm.provider "virtualbox" do |vb|
+   client.vm.provider "libvirt" do |vb|
      vb.memory = "512"
      vb.cpus = 1
    end
+   client.vm.synced_folder "./", "/vagrant", type: "rsync"
    client.vm.provision "ansible/client", type: "ansible" do |ansible|
      ansible.playbook = "ansible/openvpn_client.yml"
      ansible.verbose = "v"
